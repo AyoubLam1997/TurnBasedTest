@@ -18,13 +18,21 @@ void ARPGCombatSystem::BeginPlay()
 
 	for (int i = 0; i < PlayerUnits.Num(); i++)
 	{
-		ARPGBaseUnit* unit = GetWorld()->SpawnActor<ARPGBaseUnit>(PlayerUnits[i], pos1, rot1, SpawnInfo);
+		float x = 100.f;
+
+		float posX = -200.f + (x * i);
+
+		ARPGBaseUnit* unit = GetWorld()->SpawnActor<ARPGBaseUnit>(PlayerUnits[i], FVector(posX, 200, 0), rot1, SpawnInfo);
 
 		AllUnits.Add(unit);
 	}
 	for (int i = 0; i < EnemyUnits.Num(); i++)
 	{
-		ARPGBaseUnit* unit = GetWorld()->SpawnActor<ARPGBaseUnit>(EnemyUnits[i], pos2, rot1, SpawnInfo);
+		float x = 100.f;
+
+		float posX = -200.f + (x * i);
+
+		ARPGBaseUnit* unit = GetWorld()->SpawnActor<ARPGBaseUnit>(EnemyUnits[i], FVector(posX, -200, 0), rot1, SpawnInfo);
 
 		AllUnits.Add(unit);
 	}
@@ -63,6 +71,8 @@ void ARPGCombatSystem::Tick(float DeltaTime)
 
 			CurrentRound += 1;
 		}
+
+		AllUnits[CurrentUnitIndex]->TakeDamage(AllUnits[CurrentUnitIndex]->Stats.Strength, AllUnits[CurrentUnitIndex]->Type);
 	}
 
 	Super::Tick(DeltaTime);
@@ -75,6 +85,7 @@ void ARPGCombatSystem::SetUnits()
 	OrderUnitsBySpeed();
 }
 
+// Order units based on speed. The higher the speed stat, the higher the turn order
 void ARPGCombatSystem::OrderUnitsBySpeed()
 {
 	AllUnits.Sort([](const ARPGBaseUnit& U1, const ARPGBaseUnit& U2)

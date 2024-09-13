@@ -32,3 +32,29 @@ void ARPGBaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+// Implementation is based on this source: https://rpg.fandom.com/wiki/Damage_Formula
+void ARPGBaseUnit::TakeDamage(int damage, EUnitElementType attackerType)
+{
+	float damageMultiplier = ElementTypeChart::TypeDamage(attackerType, Type);
+
+	int def = 100 + Stats.Defence;
+
+	float def2 = 100.f / def;
+
+	int dmg = damage * def2;
+
+	dmg *= damageMultiplier;
+
+	// TODO: Apply damage to unit
+	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Red, FString::FromInt(dmg));
+}
+
+FUnitStats::FUnitStats()
+{
+	CurrentHealth = Health;
+}
+
+void FUnitStats::RemoveHealth(int health)
+{
+	CurrentHealth -= health;
+}
