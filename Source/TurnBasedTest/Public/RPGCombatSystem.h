@@ -9,7 +9,8 @@
 
 #include "RPGCombatSystem.generated.h"
 
-enum BattleState
+UENUM(Blueprintable)
+enum EBattleState
 {
 	Setup = 0,
 	PlayerChoosing,
@@ -29,11 +30,11 @@ class TURNBASEDTEST_API ARPGCombatSystem : public AGameModeBase
 	
 public:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<class ARPGBaseUnit*> AllUnits;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<TSubclassOf<class ARPGBaseUnit>> PlayerUnits;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<TSubclassOf<class ARPGBaseUnit>> EnemyUnits;
 
 	//TArray<TSubclassOf<class ARPGBaseUnit>> EnemyUnits;
@@ -49,4 +50,14 @@ public:
 
 	void SetUnits();
 	void OrderUnitsBySpeed();
+
+	UFUNCTION(BlueprintCallable)
+	void PerformUnitAttack();
+	UFUNCTION(BlueprintCallable)
+	void PerformUnitAttackOnSpecifiedTarget(int index);
+
+protected:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EBattleState> BattleState;
 };

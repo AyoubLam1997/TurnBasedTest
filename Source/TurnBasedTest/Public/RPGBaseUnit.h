@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+
+#include "Components/SkeletalMeshComponent.h"
+
 #include "RPGBaseUnit.generated.h"
 
 UENUM(BlueprintType)
@@ -29,14 +32,14 @@ public:
 		float** chart = new float*[6];
 
 		/// Damage multipliers based on damage types
-		/// DEV NOTE: These multipliers are for testing purposes. Daage should either be multiplied by 2 or .5
+		/// DEV NOTE: These multipliers are for testing purposes. Damage should either be multiplied by 2 or .5
 		///                      NORM   BLDG   SLSH   GRPL   WTR   FIRE
-		chart[0] = new float[6] {1.f,   1.f,   1.f,   1.f,   1.f,  1.f};
-		chart[1] = new float[6] {11.f,  12.f,  13.f,  14.f,  15.f, 16.f};
-		chart[2] = new float[6] {.5f,   .5f,   .5f,   .5f,   .5f,  .5f};
-		chart[3] = new float[6] {2.f,   2.f,   2.f,   2.f,   2.f,  2.f};
-		chart[4] = new float[6] {25.f,  25.f,  25.f,  25.f,  25.f, 25.f};
-		chart[5] = new float[6] {1.f,   2.f,   3.f,   4.f,   5.f,  6.f};
+		chart[0] = new float[6] {1.f,   1.f,   1.f,   1.f,   1.f,  1.f}; // NORM
+		chart[1] = new float[6] {1.f,   .5f,   2.F,   .5f,   1.f,  1.f}; // BLDG
+		chart[2] = new float[6] {1.f,   2.f,   .5f,   .5f,   1.f,  1.f}; // SLSH
+		chart[3] = new float[6] {1.f,   .5f,   2.f,   2.f,   1.f,  2.f}; // GRPL
+		chart[4] = new float[6] {1.f,   1.f,   1.f,   1.F,   .5f,  2.f}; // WTR
+		chart[5] = new float[6] {1.f,   1.f,   1.f,   1.f,   2.f,  .5f}; // FIRE
 
 		return chart;
 	}
@@ -103,6 +106,18 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TEnumAsByte<EUnitElementType> Type;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//class URPGBaseAttack* BaseAttack;
+	TSubclassOf<class URPGBaseAttack> BaseAttack;
+
+	UPROPERTY(EditAnywhere, Category = "Default animations")
+	UAnimSequence* Attack;
+	UPROPERTY(EditAnywhere, Category = "Default animations")
+	UAnimSequence* Dash;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* SkeletalMesh;
 
 	void TakeDamage(int damage, EUnitElementType attackerType);
 };

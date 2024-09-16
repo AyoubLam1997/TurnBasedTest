@@ -16,7 +16,7 @@ public:
 
 	// Sets default values for this pawn's properties
 	ABaseUnit();
-
+	
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
