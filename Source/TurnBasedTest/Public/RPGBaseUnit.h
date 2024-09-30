@@ -81,6 +81,15 @@ public:
 	void RemoveHealth(int value);
 };
 
+UENUM(Blueprintable)
+enum EUnitState
+{
+	Idle = 0,
+	PerformingAbility,
+	MovingToLocation,
+	MovingBack
+};
+
 UCLASS()
 class TURNBASEDTEST_API ARPGBaseUnit : public APawn
 {
@@ -119,5 +128,33 @@ public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SkeletalMesh;
 
+	UPROPERTY(ReplicatedUsing = OnRep_OnStateSwitch)
+	TEnumAsByte<EUnitState> UnitState;
+
+	FVector BattleLocation;
+
+	UPROPERTY(ReplicatedUsing = OnRep_OnLocationSetip)
+	FVector LocationToMoveTowards;
+
+	class URPGBaseAbility* AbilityToPerform;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const;
+
+	void SetAbilityToPerform(class URPGBaseAbility* ability);
+
 	void TakeDamage(int damage, EUnitElementType attackerType);
+
+	void MoveToLocation(FVector location);
+
+	void SetUnitState(EUnitState state);
+
+	void SetUnitBattleLocation(FVector location);
+	void SetLocationToMove(FVector location);
+
+	UFUNCTION()
+	void OnRep_OnStateSwitch();
+	UFUNCTION()
+	void OnRep_OnLocationSetip();
+
+	const bool IsOnBattleLocation() const;
 };

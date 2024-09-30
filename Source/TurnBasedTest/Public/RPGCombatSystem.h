@@ -3,14 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 
 #include "Camera/CameraActor.h"
 
 #include "RPGCombatSystem.generated.h"
 
+class AGameStateRPG;
+
 UENUM(Blueprintable)
-enum EBattleState
+enum class EBattleState
 {
 	Setup = 0,
 	PlayerChoosing,
@@ -24,7 +26,7 @@ enum EBattleState
  * 
  */
 UCLASS()
-class TURNBASEDTEST_API ARPGCombatSystem : public AGameModeBase
+class TURNBASEDTEST_API ARPGCombatSystem : public AGameMode
 {
 	GENERATED_BODY()
 	
@@ -33,9 +35,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<class ARPGBaseUnit*> AllUnits;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<TSubclassOf<class ARPGBaseUnit>> PlayerUnits;
+	TArray<class ARPGBaseUnit*> PlayerUnits;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<TSubclassOf<class ARPGBaseUnit>> EnemyUnits;
+	TArray<class ARPGBaseUnit*> EnemyUnits;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<TSubclassOf<class ARPGBaseUnit>> PlayersToSpawn;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<TSubclassOf<class ARPGBaseUnit>> EnemiesToSpawn;
 
 	//TArray<TSubclassOf<class ARPGBaseUnit>> EnemyUnits;
 
@@ -55,6 +61,13 @@ public:
 	void PerformUnitAttack();
 	UFUNCTION(BlueprintCallable)
 	void PerformUnitAttackOnSpecifiedTarget(int index);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<APlayerController*> PlayerControllerList;
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	AGameStateRPG* ReturnRPGGameState();
 
 protected:
 
