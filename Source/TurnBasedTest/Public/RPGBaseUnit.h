@@ -125,12 +125,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Default animations")
 	UAnimSequence* Dash;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Replicated)
 	USkeletalMeshComponent* SkeletalMesh;
 
-	UPROPERTY(ReplicatedUsing = OnRep_OnStateSwitch)
+	UPROPERTY(Replicated)
 	TEnumAsByte<EUnitState> UnitState;
 
+	UPROPERTY(Replicated)
 	FVector BattleLocation;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OnLocationSetip)

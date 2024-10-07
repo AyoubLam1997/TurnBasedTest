@@ -47,7 +47,9 @@ void ARPGCombatSystem::BeginPlay()
 		AllUnits.Add(unit);
 	}
 
-	ReturnRPGGameState()->AllUnits = AllUnits;;
+	ReturnRPGGameState()->AllUnits = AllUnits;
+	ReturnRPGGameState()->PlayerUnits = PlayerUnits;
+	ReturnRPGGameState()->EnemyUnits = EnemyUnits;
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Reordering based on speed"));
 
@@ -57,72 +59,71 @@ void ARPGCombatSystem::BeginPlay()
 
 	BattleState = EBattleState::Setup;
 
+	PrimaryActorTick.bCanEverTick = true;
+
 	Super::BeginPlay();
 }
 
 void ARPGCombatSystem::Tick(float DeltaTime)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Active Unit: ") + AllUnits[CurrentUnitIndex]->GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Round: ") + FString::FromInt(CurrentRound));
+	//switch (BattleState)
+	//{
+	//case EBattleState::Setup:
+	//	break;
 
-	switch (BattleState)
-	{
-	case EBattleState::Setup:
-		break;
+	//case EBattleState::PlayerChoosing:
+	//	break;
 
-	case EBattleState::PlayerChoosing:
-		break;
+	//case EBattleState::UnitPerformingAction:
 
-	case EBattleState::UnitPerformingAction:
+	//	double dis = FVector::Dist(AllUnits[CurrentUnitIndex]->GetActorLocation(), AllUnits[CurrentUnitIndex]->BattleLocation);
 
-		double dis = FVector::Dist(AllUnits[CurrentUnitIndex]->GetActorLocation(), AllUnits[CurrentUnitIndex]->BattleLocation);
+	//	if(AllUnits[CurrentUnitIndex]->UnitState == EUnitState::MovingBack && dis <= 5)
+	//	{
+	//		AllUnits[CurrentUnitIndex]->UnitState = EUnitState::Idle;
 
-		if(AllUnits[CurrentUnitIndex]->UnitState == EUnitState::MovingBack && dis <= 5)
-		{
-			AllUnits[CurrentUnitIndex]->UnitState = EUnitState::Idle;
+	//		CurrentUnitIndex += 1;
 
-			CurrentUnitIndex += 1;
+	//		if (CurrentUnitIndex >= AllUnits.Num())
+	//		{
+	//			CurrentUnitIndex = 0;
 
-			if (CurrentUnitIndex >= AllUnits.Num())
-			{
-				CurrentUnitIndex = 0;
+	//			CurrentRound += 1;
+	//		}
 
-				CurrentRound += 1;
-			}
+	//		ReturnRPGGameState()->SetIndex(CurrentUnitIndex);
 
-			ReturnRPGGameState()->SetIndex(CurrentUnitIndex);
+	//		BattleState = EBattleState::Setup;
+	//	}
 
-			BattleState = EBattleState::Setup;
-		}
+	//	break;
 
-		break;
+	//}
 
-	}
+	//ReturnRPGGameState()->SetState(BattleState);
 
-	ReturnRPGGameState()->SetState(BattleState);
+	//if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
+	//{
+	//	CurrentUnitIndex += 1;
 
-	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
-	{
-		CurrentUnitIndex += 1;
+	//	if (CurrentUnitIndex >= AllUnits.Num())
+	//	{
+	//		CurrentUnitIndex = 0;
 
-		if (CurrentUnitIndex >= AllUnits.Num())
-		{
-			CurrentUnitIndex = 0;
+	//		CurrentRound += 1;
+	//	}
 
-			CurrentRound += 1;
-		}
+	//	ReturnRPGGameState()->SetIndex(CurrentUnitIndex);
 
-		ReturnRPGGameState()->SetIndex(CurrentUnitIndex);
+	//	/*if (BattleState == EBattleState::Setup)
+	//		BattleState = EBattleState::SetNewRound;
+	//	else
+	//		BattleState = EBattleState::Setup;*/
 
-		/*if (BattleState == EBattleState::Setup)
-			BattleState = EBattleState::SetNewRound;
-		else
-			BattleState = EBattleState::Setup;*/
+	//	/*AllUnits[CurrentUnitIndex]->BaseAttack->GetDefaultObject<URPGBaseAttack>()->PerformAction(AllUnits[CurrentUnitIndex], AllUnits[0]);
 
-		/*AllUnits[CurrentUnitIndex]->BaseAttack->GetDefaultObject<URPGBaseAttack>()->PerformAction(AllUnits[CurrentUnitIndex], AllUnits[0]);
-
-		AllUnits[0]->SkeletalMesh->PlayAnimation(AllUnits[0]->Dash, 0);*/
-	}
+	//	AllUnits[0]->SkeletalMesh->PlayAnimation(AllUnits[0]->Dash, 0);*/
+	//}
 
 	//FVector value = FMath::Lerp(AllUnits[0]->GetActorLocation(), AllUnits[CurrentUnitIndex]->GetActorLocation(), .05f);
 
@@ -139,7 +140,7 @@ void ARPGCombatSystem::SetUnits()
 {
 	// Set player & enemy units on startup
 
-	OrderUnitsBySpeed();
+	//OrderUnitsBySpeed();
 }
 
 // Order units based on speed. The higher the speed stat, the higher the turn order

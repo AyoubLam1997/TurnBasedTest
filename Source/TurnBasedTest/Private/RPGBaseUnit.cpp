@@ -40,6 +40,9 @@ void ARPGBaseUnit::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ARPGBaseUnit, UnitState);
+	DOREPLIFETIME(ARPGBaseUnit, SkeletalMesh);
+	DOREPLIFETIME(ARPGBaseUnit, BattleLocation);
+	DOREPLIFETIME(ARPGBaseUnit, LocationToMoveTowards);
 }
 
 // Called every frame
@@ -60,8 +63,7 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 		if (dis <= 5)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Point reached"));
-			SkeletalMesh->PlayAnimation(Attack, 0);
-			UnitState = EUnitState::PerformingAbility;
+			SetUnitState(EUnitState::PerformingAbility);
 		}
 	}
 	break;
@@ -70,8 +72,7 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 
 		if(!SkeletalMesh->IsPlaying())
 		{
-			SkeletalMesh->PlayAnimation(Dash, 0);
-			UnitState = EUnitState::MovingBack;
+			SetUnitState(EUnitState::MovingBack);
 		}
 
 		break;

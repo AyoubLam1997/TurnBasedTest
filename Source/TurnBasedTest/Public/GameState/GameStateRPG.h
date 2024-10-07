@@ -19,25 +19,44 @@ class TURNBASEDTEST_API AGameStateRPG : public AGameState
 	
 public:
 
-	UPROPERTY(ReplicatedUsing = OnRep_OnBattleStateSwitch)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
 	TEnumAsByte<EBattleState> BattleState;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
 	TArray<class ARPGBaseUnit*> AllUnits;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
+	TArray<class ARPGBaseUnit*> PlayerUnits;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
+	TArray<class ARPGBaseUnit*> EnemyUnits;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 
-	UPROPERTY(Replicated)
-	int CurrentUnitIndex;
+	class ARPGBaseUnit* CurrentActiveUnit;
 
-	UPROPERTY(ReplicatedUsing = OnRep_OnRoundSwitch)
-	int CurrentRound;
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	int CurrentUnitIndex = 0;
+
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	int CurrentRound = 0;
 
 	void BeginPlay() override;
+	void Tick(float DeltaTime) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const;
+	void SetUnits();
+	void OrderUnitsBySpeed();
 
 	void SetState(EBattleState state);
-
 	void SetIndex(int index);
+	UFUNCTION(BlueprintCallable)
+	void SetRound(int index);
+
+	UFUNCTION(BlueprintCallable)
+	void PerformUnitAttack();
+	UFUNCTION(BlueprintCallable)
+	void PerformUnitAttackOnSpecifiedTarget(int index);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<APlayerController*> PlayerControllerList;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const;
 
 	UFUNCTION()
 	void OnRep_OnBattleStateSwitch();
