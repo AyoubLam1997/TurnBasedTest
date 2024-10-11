@@ -33,6 +33,11 @@ public:
 	class ARPGBaseUnit* CurrentActiveUnit;
 
 	UPROPERTY(BlueprintReadWrite, Replicated)
+	class  ARPGPlayerPawnController* P1Pawn;
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	class  ARPGPlayerPawnController* P2Pawn;
+
+	UPROPERTY(BlueprintReadWrite, Replicated)
 	int CurrentUnitIndex = 0;
 
 	UPROPERTY(BlueprintReadOnly, Replicated)
@@ -51,7 +56,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PerformUnitAttack();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable/*, NetMulticast, Reliable*/)
 	void PerformUnitAttackOnSpecifiedTarget(int index);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

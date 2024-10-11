@@ -91,7 +91,7 @@ void ARPGBaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 
 // Implementation is based on this source: https://rpg.fandom.com/wiki/Damage_Formula
-void ARPGBaseUnit::TakeDamage(int damage, EUnitElementType attackerType)
+void ARPGBaseUnit::TakeDamage(int damage, TEnumAsByte<EUnitElementType> attackerType)
 {
 	float damageMultiplier = ElementTypeChart::TypeDamage(attackerType, Type);
 

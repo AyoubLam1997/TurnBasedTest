@@ -89,7 +89,12 @@ void AGameStateRPG::Tick(float DeltaTime)
 				CurrentRound += 1;
 			}
 
-			BattleState = EBattleState::Setup;
+			if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::PlayerChoosing;
+			else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::EnemyChoosing;
+
+			//BattleState = EBattleState::Setup;
 		}
 
 		break;
@@ -160,6 +165,8 @@ void AGameStateRPG::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AGameStateRPG, P1Pawn);
+	DOREPLIFETIME(AGameStateRPG, P2Pawn);
 	DOREPLIFETIME(AGameStateRPG, BattleState);
 	DOREPLIFETIME(AGameStateRPG, AllUnits);
 	DOREPLIFETIME(AGameStateRPG, PlayerUnits);
@@ -208,3 +215,7 @@ void AGameStateRPG::OnRep_OnRoundSwitch()
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Round has switched"));
 }
 
+//void PerformUnitAttackOnSpecifiedTarget_Implementation(int index)
+//{
+//
+//}

@@ -47,18 +47,20 @@ void ARPGCombatSystem::BeginPlay()
 		AllUnits.Add(unit);
 	}
 
+	SetUnits();
+
+	CurrentRound = 1;
+
+	BattleState = EBattleState::PlayerChoosing;
+
 	ReturnRPGGameState()->AllUnits = AllUnits;
 	ReturnRPGGameState()->PlayerUnits = PlayerUnits;
 	ReturnRPGGameState()->EnemyUnits = EnemyUnits;
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Reordering based on speed"));
 
-	SetUnits();
-
-	CurrentRound = 1;
-
-	BattleState = EBattleState::Setup;
-
+	ReturnRPGGameState()->BattleState = EBattleState::PlayerChoosing;
+	
 	PrimaryActorTick.bCanEverTick = true;
 
 	Super::BeginPlay();
@@ -140,7 +142,7 @@ void ARPGCombatSystem::SetUnits()
 {
 	// Set player & enemy units on startup
 
-	//OrderUnitsBySpeed();
+	OrderUnitsBySpeed();
 }
 
 // Order units based on speed. The higher the speed stat, the higher the turn order
@@ -187,11 +189,27 @@ void ARPGCombatSystem::PerformUnitAttackOnSpecifiedTarget(int index)
 
 void ARPGCombatSystem::PostLogin(APlayerController* NewPlayer)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Player has joined the session"));
-
 	Super::PostLogin(NewPlayer);
 
 	PlayerControllerList.Add(NewPlayer);
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("Player has recently joined the session ") + FString::FromInt(PlayerControllerList.Num()));
+
+	/*if (ReturnRPGGameState()->P1Pawn == nullptr)
+		ReturnRPGGameState()->P1Pawn = NewPlayer->GetPawn();
+	else if (ReturnRPGGameState()->P2Pawn == nullptr)
+		ReturnRPGGameState()->P2Pawn = NewPlayer->GetPawn();*/
+	/*if (P1Pawn == nullptr)
+	{
+		P1Pawn = NewPlayer->GetPawn();
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::FromInt((P1Pawn == nullptr)));
+	}
+	else if (P2Pawn == nullptr)
+	{
+		P2Pawn = NewPlayer->GetPawn();
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::FromInt((P2Pawn == nullptr)));
+
+	}*/
 }
 
 AGameStateRPG* ARPGCombatSystem::ReturnRPGGameState()

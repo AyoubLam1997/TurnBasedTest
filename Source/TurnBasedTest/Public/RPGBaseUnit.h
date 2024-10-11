@@ -143,7 +143,7 @@ public:
 
 	void SetAbilityToPerform(class URPGBaseAbility* ability);
 
-	void TakeDamage(int damage, EUnitElementType attackerType);
+	void TakeDamage(int damage, TEnumAsByte<EUnitElementType> attackerType);
 
 	void MoveToLocation(FVector location);
 
