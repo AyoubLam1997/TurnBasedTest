@@ -22,6 +22,9 @@ enum EUnitElementType
 	//Wind
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnAbilityUse);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAbilityUsing, ARPGBaseUnit*, ARPGBaseUnit*);
+
 // Simulates basic strength/weakness chart, where damage is either doubled or halved
 class ElementTypeChart
 {
@@ -120,6 +123,10 @@ public:
 	//class URPGBaseAttack* BaseAttack;
 	TSubclassOf<class URPGBaseAttack> BaseAttack;
 
+	//class URPGBaseAttack* BaseAttack;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
+	TArray<TSubclassOf<URPGBaseAbility>> EquippedAbilities;
+
 	UPROPERTY(EditAnywhere, Category = "Default animations")
 	UAnimSequence* Attack;
 	UPROPERTY(EditAnywhere, Category = "Default animations")
@@ -137,11 +144,13 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_OnLocationSetip)
 	FVector LocationToMoveTowards;
 
-	class URPGBaseAbility* AbilityToPerform;
+	UPROPERTY(Replicated)
+	TSubclassOf<class URPGBaseAbility> AbilityToPerform;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const;
 
-	void SetAbilityToPerform(class URPGBaseAbility* ability);
+	UFUNCTION(BlueprintCallable)
+	void SetAbilityToPerform(TSubclassOf<class URPGBaseAbility> ability);
 
 	void TakeDamage(int damage, TEnumAsByte<EUnitElementType> attackerType);
 
@@ -158,4 +167,9 @@ public:
 	void OnRep_OnLocationSetip();
 
 	const bool IsOnBattleLocation() const;
+
+	DECLARE_MULTICAST_DELEGATE(actor);
+	FOnAbilityUse OnAbilityUseEvent;
+
+	FOnAbilityUsing OnAbility;
 };

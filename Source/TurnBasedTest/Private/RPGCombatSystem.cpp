@@ -5,6 +5,7 @@
 
 #include "RPGBaseUnit.h"
 
+#include "Abilities/RPGBaseAbility.h"
 #include "Abilities/RPGBaseAttack.h"
 
 #include "GameState/GameStateRPG.h"
@@ -165,26 +166,34 @@ void ARPGCombatSystem::PerformUnitAttackOnSpecifiedTarget(int index)
 {
 	//AllUnits[CurrentUnitIndex]->BaseAttack->GetDefaultObject<URPGBaseAttack>()->PerformAction(AllUnits[CurrentUnitIndex], EnemyUnits[index]->GetDefaultObject<ARPGBaseUnit>());
 
-	if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+	if (AllUnits[CurrentUnitIndex]->AbilityToPerform != nullptr)
 	{
-		BattleState = EBattleState::UnitPerformingAction;
+		if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+		{
+			BattleState = EBattleState::UnitPerformingAction;
 
-		ReturnRPGGameState()->SetState(BattleState);
+			ReturnRPGGameState()->SetState(BattleState);
 
-		AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-		AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
-		AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+			AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
+			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+		}
+		else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
+		{
+			BattleState = EBattleState::UnitPerformingAction;
+
+			ReturnRPGGameState()->SetState(BattleState);
+
+			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+			AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
+			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+		}
 	}
-	else if(EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
-	{
-		BattleState = EBattleState::UnitPerformingAction;
+}
 
-		ReturnRPGGameState()->SetState(BattleState);
-
-		AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-		AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
-		AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
-	}
+void ARPGCombatSystem::SetChosenAbilityToUnit(TSubclassOf<URPGBaseAbility> ability)
+{
+	AllUnits[CurrentUnitIndex]->AbilityToPerform = ability;
 }
 
 void ARPGCombatSystem::PostLogin(APlayerController* NewPlayer)

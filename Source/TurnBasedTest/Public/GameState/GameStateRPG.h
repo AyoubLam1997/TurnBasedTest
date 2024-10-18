@@ -58,6 +58,8 @@ public:
 	void PerformUnitAttack();
 	UFUNCTION(BlueprintCallable/*, NetMulticast, Reliable*/)
 	void PerformUnitAttackOnSpecifiedTarget(int index);
+	UFUNCTION(BlueprintCallable)
+	void SetChosenAbilityToUnit(TSubclassOf<class URPGBaseAbility> ability);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<APlayerController*> PlayerControllerList;

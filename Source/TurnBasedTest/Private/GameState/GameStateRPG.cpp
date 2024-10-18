@@ -4,6 +4,7 @@
 #include "GameState/GameStateRPG.h"
 #include "RPGCombatSystem.h"
 #include "RPGBaseUnit.h"
+#include "Abilities/RPGBaseAbility.h"
 #include "Abilities/RPGBaseAttack.h"
 
 #include "Net/UnrealNetwork.h"
@@ -70,6 +71,8 @@ void AGameStateRPG::Tick(float DeltaTime)
 		break;
 
 	case EBattleState::PlayerChoosing:
+		break;
+	case EBattleState::EnemyChoosing:
 		break;
 
 	case EBattleState::UnitPerformingAction:
@@ -141,24 +144,79 @@ void AGameStateRPG::PerformUnitAttack()
 
 void AGameStateRPG::PerformUnitAttackOnSpecifiedTarget(int index)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Unit attacks: ") + AllUnits[index]->GetName());
-
-	if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+	if (AllUnits[CurrentUnitIndex]->AbilityToPerform != nullptr)
 	{
-		BattleState = EBattleState::UnitPerformingAction;
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Unit attacks: ") + AllUnits[index]->GetName());
 
-		AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-		AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
-		AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
-	}
-	else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
-	{
-		BattleState = EBattleState::UnitPerformingAction;
+		switch (BattleState)
+		{
+		case EBattleState::PlayerChoosing:
+			break;
+		case EBattleState::EnemyChoosing:
+			break;
+		}
 
-		AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-		AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
-		AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+		if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+		{
+			AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target = EnemyUnits[index];
+
+			URPGBaseAbility* abl = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+
+			AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
+
+			/*CurrentUnitIndex += 1;
+
+			if (CurrentUnitIndex >= AllUnits.Num())
+			{
+				CurrentUnitIndex = 0;
+
+				CurrentRound += 1;
+			}
+
+			if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::PlayerChoosing;
+			else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::EnemyChoosing;*/
+
+			BattleState = EBattleState::UnitPerformingAction;
+
+			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+			AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
+			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+		}
+		else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
+		{
+			AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target = PlayerUnits[index];
+
+			URPGBaseAbility* abl = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+
+			AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
+			/*CurrentUnitIndex += 1;
+
+			if (CurrentUnitIndex >= AllUnits.Num())
+			{
+				CurrentUnitIndex = 0;
+
+				CurrentRound += 1;
+			}
+
+			if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::PlayerChoosing;
+			else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
+				BattleState = EBattleState::EnemyChoosing;*/
+
+			BattleState = EBattleState::UnitPerformingAction;
+
+			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+			AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
+			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+		}
 	}
+}
+
+void AGameStateRPG::SetChosenAbilityToUnit(TSubclassOf<URPGBaseAbility> ability)
+{
+	AllUnits[CurrentUnitIndex]->AbilityToPerform = ability;
 }
 
 void AGameStateRPG::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

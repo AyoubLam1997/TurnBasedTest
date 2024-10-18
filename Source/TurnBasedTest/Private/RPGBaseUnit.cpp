@@ -32,6 +32,8 @@ void ARPGBaseUnit::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//AbilityToPerform->AddToRoot();
+
 	LocationToMoveTowards = FVector(0, 0, 0);
 }
 
@@ -72,6 +74,8 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 
 		if(!SkeletalMesh->IsPlaying())
 		{
+			/*OnAbility.Broadcast(this, AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
+			OnAbility.Clear();*/
 			SetUnitState(EUnitState::MovingBack);
 		}
 
@@ -107,7 +111,7 @@ void ARPGBaseUnit::TakeDamage(int damage, TEnumAsByte<EUnitElementType> attacker
 	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Red, FString::FromInt(dmg));
 }
 
-void ARPGBaseUnit::SetAbilityToPerform(URPGBaseAbility* ability)
+void ARPGBaseUnit::SetAbilityToPerform(TSubclassOf<URPGBaseAbility> ability)
 {
 	AbilityToPerform = ability;
 }

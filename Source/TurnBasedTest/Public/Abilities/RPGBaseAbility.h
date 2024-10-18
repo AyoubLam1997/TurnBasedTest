@@ -23,6 +23,15 @@ class TURNBASEDTEST_API URPGBaseAbility : public UObject
 
 public:
 
+	class ARPGBaseUnit* Target;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString AbilityName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EAbilityTargetType> AbilityType;
+
+	UFUNCTION()
 	virtual void PerformAction(class ARPGBaseUnit* owner, class ARPGBaseUnit* target);
 	
 };

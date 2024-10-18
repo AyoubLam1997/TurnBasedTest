@@ -9,5 +9,7 @@ void URPGBaseAttack::PerformAction(ARPGBaseUnit* owner, ARPGBaseUnit* target)
 {
 	int baseAttack = Damage * (owner->Stats.Strength / 2);
 
-	target->TakeDamage(baseAttack, Type);
+	target->TakeDamage(baseAttack, ElementType);
+
+	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Red, TEXT("Performing attack"));
 }

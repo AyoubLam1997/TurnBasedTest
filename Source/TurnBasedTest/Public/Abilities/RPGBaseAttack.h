@@ -22,5 +22,5 @@ public:
 	int Damage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TEnumAsByte<enum EUnitElementType> Type;
+	TEnumAsByte<enum EUnitElementType> ElementType;
 };
