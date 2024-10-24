@@ -4,6 +4,7 @@
 #include "RPGBaseUnit.h"
 
 #include "Abilities/RPGBaseAbility.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 FUnitStats::FUnitStats()
@@ -11,9 +12,17 @@ FUnitStats::FUnitStats()
 	CurrentHealth = Health;
 }
 
-void FUnitStats::RemoveHealth(int health)
+void FUnitStats::RemoveHealth(int value)
 {
-	CurrentHealth -= health;
+	CurrentHealth = CurrentHealth - value;
+}
+
+void FUnitStats::AddHealth(int value)
+{
+	CurrentHealth += value;
+
+	if (CurrentHealth > Health)
+		CurrentHealth = Health;
 }
 
 // Sets default values
@@ -41,6 +50,7 @@ void ARPGBaseUnit::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ARPGBaseUnit, Stats);
 	DOREPLIFETIME(ARPGBaseUnit, UnitState);
 	DOREPLIFETIME(ARPGBaseUnit, SkeletalMesh);
 	DOREPLIFETIME(ARPGBaseUnit, BattleLocation);
@@ -64,7 +74,6 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 
 		if (dis <= 5)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Point reached"));
 			SetUnitState(EUnitState::PerformingAbility);
 		}
 	}
@@ -74,8 +83,11 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 
 		if(!SkeletalMesh->IsPlaying())
 		{
-			/*OnAbility.Broadcast(this, AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
-			OnAbility.Clear();*/
+			//OnAbility.Broadcast(this, AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
+			//OnAbility.Clear();
+
+			//AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->PerformAction(this, AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
+
 			SetUnitState(EUnitState::MovingBack);
 		}
 
@@ -85,6 +97,12 @@ void ARPGBaseUnit::Tick(float DeltaTime)
 		MoveToLocation(BattleLocation);
 		break;
 	}
+}
+
+// Called to bind functionality to input
+void ARPGBaseUnit::PerformAbility()
+{
+	AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->PerformAction(this, AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
 }
 
 // Called to bind functionality to input
@@ -107,8 +125,18 @@ void ARPGBaseUnit::TakeDamage(int damage, TEnumAsByte<EUnitElementType> attacker
 
 	dmg *= damageMultiplier;
 
-	// TODO: Apply damage to unit
-	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Red, FString::FromInt(dmg));
+	Stats.RemoveHealth(dmg);
+}
+
+// Implementation is based on this source: https://rpg.fandom.com/wiki/Damage_Formula
+void ARPGBaseUnit::TakeUnscaledDamage(int damage)
+{
+	Stats.RemoveHealth(damage);
+}
+
+void ARPGBaseUnit::TakeHealth(int health)
+{
+	Stats.AddHealth(health);
 }
 
 void ARPGBaseUnit::SetAbilityToPerform(TSubclassOf<URPGBaseAbility> ability)
@@ -169,6 +197,14 @@ void ARPGBaseUnit::OnRep_OnStateSwitch()
 void ARPGBaseUnit::OnRep_OnLocationSetip()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Unit location set"));
+}
+
+const bool ARPGBaseUnit::IsDead() const
+{
+	if (Stats.CurrentHealth <= 0.f)
+		return 1;
+
+	return 0;
 }
 
 const bool ARPGBaseUnit::IsOnBattleLocation() const

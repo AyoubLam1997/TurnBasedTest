@@ -8,5 +8,5 @@
 
 void URPGBaseAbility::PerformAction(ARPGBaseUnit* owner, ARPGBaseUnit* target)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Red, TEXT("Performing ability"));
+	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Blue, TEXT("Performing ability"));
 }

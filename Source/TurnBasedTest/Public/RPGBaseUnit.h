@@ -79,9 +79,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Magic;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int CurrentHealth;
 
 	void RemoveHealth(int value);
+	void AddHealth(int value);
 };
 
 UENUM(Blueprintable)
@@ -113,7 +115,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
 	FUnitStats Stats;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -154,12 +156,22 @@ public:
 
 	void TakeDamage(int damage, TEnumAsByte<EUnitElementType> attackerType);
 
+	UFUNCTION(BlueprintCallable)
+	void TakeUnscaledDamage(int damage);
+
+	void PerformAbility();
+
+	void TakeHealth(int health);
+
 	void MoveToLocation(FVector location);
 
 	void SetUnitState(EUnitState state);
 
 	void SetUnitBattleLocation(FVector location);
 	void SetLocationToMove(FVector location);
+
+	UFUNCTION(BlueprintCallable)
+	const bool IsDead() const;
 
 	UFUNCTION()
 	void OnRep_OnStateSwitch();

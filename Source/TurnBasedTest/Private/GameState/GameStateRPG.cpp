@@ -79,9 +79,23 @@ void AGameStateRPG::Tick(float DeltaTime)
 
 		double dis = FVector::Dist(AllUnits[CurrentUnitIndex]->GetActorLocation(), AllUnits[CurrentUnitIndex]->BattleLocation);
 
+		if (AllUnits[CurrentUnitIndex]->UnitState == EUnitState::PerformingAbility && !AllUnits[CurrentUnitIndex]->SkeletalMesh->IsPlaying())
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Calling function for test"));
+			//AllUnits[CurrentUnitIndex]->PerformAbility();
+
+			//AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->PerformAction(AllUnits[CurrentUnitIndex], AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>()->Target);
+
+			AbilityToPerform->PerformAction(AbilityCaller, AbilityTarget);
+		}
+
 		if (AllUnits[CurrentUnitIndex]->UnitState == EUnitState::MovingBack && dis <= 5)
 		{
 			AllUnits[CurrentUnitIndex]->UnitState = EUnitState::Idle;
+
+			/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, FString::FromInt(AllUnits[CurrentUnitIndex]->Stats.CurrentHealth));
+			AllUnits[CurrentUnitIndex]->TakeDamage(20, EUnitElementType::Normal);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, FString::FromInt(AllUnits[CurrentUnitIndex]->Stats.CurrentHealth));*/
 
 			CurrentUnitIndex += 1;
 
@@ -146,8 +160,6 @@ void AGameStateRPG::PerformUnitAttackOnSpecifiedTarget(int index)
 {
 	if (AllUnits[CurrentUnitIndex]->AbilityToPerform != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, TEXT("Unit attacks: ") + AllUnits[index]->GetName());
-
 		switch (BattleState)
 		{
 		case EBattleState::PlayerChoosing:
@@ -162,27 +174,38 @@ void AGameStateRPG::PerformUnitAttackOnSpecifiedTarget(int index)
 
 			URPGBaseAbility* abl = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
 
-			AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
+			//AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
 
-			/*CurrentUnitIndex += 1;
-
-			if (CurrentUnitIndex >= AllUnits.Num())
+			if (abl->AbilityType == EAbilityTargetType::Enemy)
 			{
-				CurrentUnitIndex = 0;
+				//abl->PerformAction(AllUnits[CurrentUnitIndex], EnemyUnits[index]);
 
-				CurrentRound += 1;
+				BattleState = EBattleState::UnitPerformingAction;
+
+				AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+				AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
+				AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+
+				AbilityToPerform = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+				AbilityCaller = AllUnits[CurrentUnitIndex];
+				AbilityTarget = EnemyUnits[index];
+
+				/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, FString::FromInt(EnemyUnits[index]->Stats.CurrentHealth));
+				EnemyUnits[index]->TakeDamage(20, EUnitElementType::Normal);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, FString::FromInt(EnemyUnits[index]->Stats.CurrentHealth));*/
 			}
+			else if(abl->AbilityType == EAbilityTargetType::Team)
+			{
+				BattleState = EBattleState::UnitPerformingAction;
 
-			if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
-				BattleState = EBattleState::PlayerChoosing;
-			else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
-				BattleState = EBattleState::EnemyChoosing;*/
+				AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+				AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
+				AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
 
-			BattleState = EBattleState::UnitPerformingAction;
-
-			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-			AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
-			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+				AbilityToPerform = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+				AbilityCaller = AllUnits[CurrentUnitIndex];
+				AbilityTarget = PlayerUnits[index];
+			}
 		}
 		else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
 		{
@@ -190,26 +213,40 @@ void AGameStateRPG::PerformUnitAttackOnSpecifiedTarget(int index)
 
 			URPGBaseAbility* abl = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
 
-			AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
-			/*CurrentUnitIndex += 1;
-
-			if (CurrentUnitIndex >= AllUnits.Num())
-			{
-				CurrentUnitIndex = 0;
-
-				CurrentRound += 1;
-			}
-
-			if (PlayerUnits.Contains(AllUnits[CurrentUnitIndex]))
-				BattleState = EBattleState::PlayerChoosing;
-			else if (EnemyUnits.Contains(AllUnits[CurrentUnitIndex]))
-				BattleState = EBattleState::EnemyChoosing;*/
+			//AllUnits[CurrentUnitIndex]->OnAbility.AddUFunction(abl, "PerformAction");
 
 			BattleState = EBattleState::UnitPerformingAction;
 
-			AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
-			AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
-			AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+			if (abl->AbilityType == EAbilityTargetType::Team)
+			{
+				BattleState = EBattleState::UnitPerformingAction;
+
+				AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+				AllUnits[CurrentUnitIndex]->SetLocationToMove(EnemyUnits[index]->GetActorLocation());
+				AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+
+				AbilityToPerform = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+				AbilityCaller = AllUnits[CurrentUnitIndex];
+				AbilityTarget = EnemyUnits[index];
+			}
+			else if (abl->AbilityType == EAbilityTargetType::Enemy)
+			{
+				//abl->PerformAction(AllUnits[CurrentUnitIndex], PlayerUnits[index]);
+
+				BattleState = EBattleState::UnitPerformingAction;
+
+				AllUnits[CurrentUnitIndex]->SkeletalMesh->PlayAnimation(AllUnits[CurrentUnitIndex]->Dash, 0);
+				AllUnits[CurrentUnitIndex]->SetLocationToMove(PlayerUnits[index]->GetActorLocation());
+				AllUnits[CurrentUnitIndex]->SetUnitState(EUnitState::MovingToLocation);
+
+				AbilityToPerform = AllUnits[CurrentUnitIndex]->AbilityToPerform->GetDefaultObject<URPGBaseAbility>();
+				AbilityCaller = AllUnits[CurrentUnitIndex];
+				AbilityTarget = PlayerUnits[index];
+				/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, FString::FromInt(PlayerUnits[index]->Stats.CurrentHealth));
+				PlayerUnits[index]->TakeDamage(20, EUnitElementType::Normal);
+
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, FString::FromInt(PlayerUnits[index]->Stats.CurrentHealth));*/
+			}
 		}
 	}
 }
@@ -223,6 +260,7 @@ void AGameStateRPG::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AGameStateRPG, AbilityToPerform);
 	DOREPLIFETIME(AGameStateRPG, P1Pawn);
 	DOREPLIFETIME(AGameStateRPG, P2Pawn);
 	DOREPLIFETIME(AGameStateRPG, BattleState);

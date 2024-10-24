@@ -61,6 +61,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetChosenAbilityToUnit(TSubclassOf<class URPGBaseAbility> ability);
 
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	class URPGBaseAbility* AbilityToPerform;
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	class ARPGBaseUnit* AbilityCaller;
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	class ARPGBaseUnit* AbilityTarget;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<APlayerController*> PlayerControllerList;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const;
